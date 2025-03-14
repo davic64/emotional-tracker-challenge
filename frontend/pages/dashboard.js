@@ -1,8 +1,9 @@
-import { useContext, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import styled from 'styled-components';
-import Layout from '../components/Layout';
-import { AuthContext } from '../context/AuthContext';
+import { useContext, useEffect } from "react";
+import { useRouter } from "next/router";
+import styled from "styled-components";
+import Layout from "../components/Layout";
+import { AuthContext } from "../context/AuthContext";
+import { CardContainer, Card, Title } from "../components/ui";
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -10,21 +11,9 @@ const DashboardContainer = styled.div`
   gap: 2rem;
 `;
 
-const WelcomeCard = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-`;
-
-const Title = styled.h1`
-  color: #2c3e50;
-  margin-top: 0;
-`;
-
-const Subtitle = styled.p`
+const Text = styled.p`
   color: #7f8c8d;
-  margin-bottom: 0;
+  margin: ${({ margin }) => margin || "0"};
 `;
 
 const Grid = styled.div`
@@ -33,24 +22,10 @@ const Grid = styled.div`
   gap: 1.5rem;
 `;
 
-const Card = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+const InfoCard = styled(Card)`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-`;
-
-const CardTitle = styled.h2`
-  color: #2c3e50;
-  margin: 0;
-`;
-
-const CardText = styled.p`
-  color: #7f8c8d;
-  margin: 0;
 `;
 
 const CardLink = styled.a`
@@ -58,7 +33,7 @@ const CardLink = styled.a`
   text-decoration: none;
   font-weight: bold;
   cursor: pointer;
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -67,14 +42,14 @@ const CardLink = styled.a`
 export default function Dashboard() {
   const { user, loading } = useContext(AuthContext);
   const router = useRouter();
-  
+
   // Basic auth protection
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [loading, user, router]);
-  
+
   if (loading || !user) {
     return (
       <Layout title="Panel - Terapia Emocional">
@@ -82,48 +57,61 @@ export default function Dashboard() {
       </Layout>
     );
   }
-  
+
   return (
     <Layout title="Panel - Terapia Emocional">
       <DashboardContainer>
-        <WelcomeCard>
+        <CardContainer>
           <Title>¡Bienvenido, {user.name}!</Title>
-          <Subtitle>Aquí tienes un resumen de tu bienestar emocional</Subtitle>
-        </WelcomeCard>
-        
+          <Text margin="1rem 0 0">
+            Aquí tienes un resumen de tu bienestar emocional
+          </Text>
+        </CardContainer>
+
         <Grid>
-          <Card>
-            <CardTitle>Seguimiento Emocional</CardTitle>
-            <CardText>
-              Registra tus emociones diarias y mantén un seguimiento de tu bienestar mental.
-            </CardText>
-            <CardLink onClick={() => router.push('/emotions')}>
-              Seguimiento de Emociones
-            </CardLink>
-          </Card>
-          
-          <Card>
-            <CardTitle>Recordatorios</CardTitle>
-            <CardText>
-              Configura recordatorios para actividades que mejoran tu salud mental.
-            </CardText>
-            <CardLink>
-              Próximamente
-            </CardLink>
-          </Card>
-          
-          <Card>
-            <CardTitle>Compartir con Terapeuta</CardTitle>
-            <CardText>
-              Comparte tus datos de seguimiento emocional con tu terapeuta.
-            </CardText>
-            <CardLink>
-              Próximamente
-            </CardLink>
-          </Card>
+          <CardContainer>
+            <InfoCard>
+              <Title order={2}>Seguimiento Emocional</Title>
+              <Text>
+                Registra tus emociones diarias y mantén un seguimiento de tu
+                bienestar mental.
+              </Text>
+              <CardLink onClick={() => router.push("/emotions")}>
+                Seguimiento de Emociones
+              </CardLink>
+            </InfoCard>
+          </CardContainer>
+
+          <CardContainer>
+            <InfoCard>
+              <Title order={2}>Recordatorios</Title>
+              <Text>
+                Configura recordatorios para actividades que mejoran tu salud
+                mental.
+              </Text>
+              <CardLink>Próximamente</CardLink>
+            </InfoCard>
+          </CardContainer>
+
+          <CardContainer>
+            <InfoCard>
+              <Title order={2}>Compartir con Terapeuta</Title>
+              <Text>
+                Comparte tus datos de seguimiento emocional con tu terapeuta.
+              </Text>
+              <CardLink>Próximamente</CardLink>
+            </InfoCard>
+          </CardContainer>
         </Grid>
-        
-        {/* TODO: Add charts and statistics */}
+
+        <CardContainer>
+          <Title order={2}>Estadísticas</Title>
+          <Grid>
+            <InfoCard>{/* Chart */}</InfoCard>
+
+            <InfoCard>{/* Stats */}</InfoCard>
+          </Grid>
+        </CardContainer>
       </DashboardContainer>
     </Layout>
   );

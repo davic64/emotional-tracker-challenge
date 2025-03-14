@@ -7,3 +7,4 @@ export * from "./Form";
 export * from "./Card";
 export * from "./Input";
 export * from "./Empty";
+export * from "./Title";
