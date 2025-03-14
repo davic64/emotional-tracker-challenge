@@ -1,4 +1,4 @@
-const errorHandler = (err, _, res, _) => {
+const errorHandler = (err, _req, res, _next) => {
   console.log(err.stack);
 
   const statusCode = err.statusCode || 500;
