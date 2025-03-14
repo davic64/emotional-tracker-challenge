@@ -1,4 +1,4 @@
-const Emotion = require('../models/emotionModel');
+const Emotion = require("../models/emotionModel");
 
 // Get all emotions for a user
 const getEmotions = async (req, res) => {
@@ -9,9 +9,9 @@ const getEmotions = async (req, res) => {
 // Get single emotion by ID
 const getEmotionById = async (req, res) => {
   const emotion = await Emotion.findById(req.params.id);
-  
+
   if (!emotion) {
-    res.status(404).json({ message: 'Emotion not found' });
+    res.status(404).json({ message: "Emotion not found" });
     return;
   }
 
@@ -26,7 +26,7 @@ const createEmotion = async (req, res) => {
     user: req.user._id,
     emotion,
     intensity,
-    notes
+    notes,
   });
 
   res.status(201).json(newEmotion);
@@ -39,10 +39,10 @@ const updateEmotion = async (req, res) => {
   const emotionRecord = await Emotion.findById(req.params.id);
 
   if (!emotionRecord) {
-    res.status(404).json({ message: 'Emotion not found' });
+    res.status(404).json({ message: "Emotion not found" });
     return;
   }
-  
+
   emotionRecord.emotion = emotion || emotionRecord.emotion;
   emotionRecord.intensity = intensity || emotionRecord.intensity;
   emotionRecord.notes = notes || emotionRecord.notes;
@@ -52,25 +52,33 @@ const updateEmotion = async (req, res) => {
 };
 
 const getEmotionSummary = async (userId) => {
-  // Inefficient query
-  const emotions = await Emotion.find({ user: userId });
-  
-  // TODO: Implement aggregation for better performance
-  const summary = {
-    count: emotions.length,
-    averageIntensity: 0,
-    emotionCounts: {}
-  };
-  
-  emotions.forEach(e => {
-    summary.averageIntensity += e.intensity;
-    summary.emotionCounts[e.emotion] = (summary.emotionCounts[e.emotion] || 0) + 1;
-  });
-  
-  if (emotions.length > 0) {
-    summary.averageIntensity /= emotions.length;
-  }
-  
+  const aggregation = [
+    {
+      $match: {
+        user: userId,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        count: { $sum: 1 },
+        averageIntensity: { $avg: "$intensity" },
+        emotionCounts: {
+          $push: { $toInt: 1 },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        count: 1,
+        averageIntensity: 1,
+        emotionCounts: 1,
+      },
+    },
+  ];
+
+  const summary = await Emotion.aggregate(aggregation);
   return summary;
 };
 
@@ -78,5 +86,6 @@ module.exports = {
   getEmotions,
   getEmotionById,
   createEmotion,
-  updateEmotion
+  updateEmotion,
+  getEmotionSummary,
 };
