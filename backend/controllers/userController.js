@@ -1,12 +1,12 @@
-const User = require('../models/userModel');
-const jwt = require('jsonwebtoken');
+const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = process.env.JWT_SECRET || 'mysecretkey123';
+const JWT_SECRET = process.env.JWT_SECRET || "mysecretkey123";
 
 // Generate JWT token
 const generateToken = (id) => {
   return jwt.sign({ id }, JWT_SECRET, {
-    expiresIn: '30d'
+    expiresIn: "30d",
   });
 };
 
@@ -18,14 +18,13 @@ const registerUser = async (req, res) => {
   const userExists = await User.findOne({ email });
 
   if (userExists) {
-    res.status(400).json({ message: 'User already exists' });
-    return;
+    throw new Error("User already exists");
   }
 
   const user = await User.create({
     name,
     email,
-    password
+    password,
   });
 
   if (user) {
@@ -33,10 +32,10 @@ const registerUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateToken(user._id)
+      token: generateToken(user._id),
     });
   } else {
-    res.status(400).json({ message: 'Invalid user data' });
+    throw new Error("Invalid user data", { statusCode: 400 });
   }
 };
 
@@ -51,10 +50,10 @@ const loginUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateToken(user._id)
+      token: generateToken(user._id),
     });
   } else {
-    res.status(401).json({ message: 'Invalid email or password' });
+    throw new Error("Invalid email or password", { statusCode: 401 });
   }
 };
 
@@ -65,15 +64,49 @@ const getUserProfile = async (req, res) => {
   res.json({
     _id: user._id,
     name: user.name,
-    email: user.email
+    email: user.email,
   });
 };
 
-// TODO: Implement user update endpoint
-// TODO: Implement password reset endpoint
+// Update user profile
+const updateUserProfile = async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+
+    await user.save();
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    });
+  } else {
+    throw new Error("User not found", { statusCode: 404 });
+  }
+};
+
+// Password reset endpoint
+const resetPassword = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new Error("User not found", { statusCode: 404 });
+  }
+
+  user.password = password;
+  await user.save();
+
+  res.json({ message: "Password reset successful" });
+};
 
 module.exports = {
   registerUser,
   loginUser,
-  getUserProfile
+  getUserProfile,
+  updateUserProfile,
 };
