@@ -4,11 +4,15 @@ import styled from "styled-components";
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
 import { CardContainer, Card, Title } from "../components/ui";
+import { summarizeEmotions } from "../lib/emotions.api";
+import { EmotionContext } from "../context/EmotionContext";
+import EmotionChart from "../components/EmotionChart";
 
 const DashboardContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  padding: 1rem;
 `;
 
 const Text = styled.p`
@@ -39,9 +43,60 @@ const CardLink = styled.a`
   }
 `;
 
-export default function Dashboard() {
+const CardStats = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StatsTitle = styled(Title)`
+  color: #2c3e50;
+  margin-bottom: 1rem;
+`;
+
+const StatsValue = styled(Title)`
+  color: #3498db;
+  margin-bottom: 0.5rem;
+`;
+
+const StatsText = styled(Text)`
+  color: #7f8c8d;
+  font-size: 1.2rem;
+`;
+
+const emotionTranslation = {
+  happy: "😊 Feliz",
+  sad: "😢 Triste",
+  angry: "😠 Enojado",
+  anxious: "😰 Ansioso",
+  neutral: "😐 Neutral",
+};
+
+export async function getServerSideProps(context) {
+  const { token } = context.req.cookies;
+
+  try {
+    const data = await summarizeEmotions(token);
+    return { props: { emotionsSummary: data } };
+  } catch (error) {
+    console.error(error);
+    return { props: { emotionsSummary: [] } };
+  }
+}
+
+export default function Dashboard({ emotionsSummary }) {
   const { user, loading } = useContext(AuthContext);
   const router = useRouter();
+  const { setInitialEmotionsSummary, emotionsSummary: contextEmotionsSummary } =
+    useContext(EmotionContext);
 
   // Basic auth protection
   useEffect(() => {
@@ -49,6 +104,10 @@ export default function Dashboard() {
       router.push("/login");
     }
   }, [loading, user, router]);
+
+  useEffect(() => {
+    setInitialEmotionsSummary(emotionsSummary);
+  }, [emotionsSummary]);
 
   if (loading || !user) {
     return (
@@ -107,9 +166,30 @@ export default function Dashboard() {
         <CardContainer>
           <Title order={2}>Estadísticas</Title>
           <Grid>
-            <InfoCard>{/* Chart */}</InfoCard>
+            <InfoCard>
+              <EmotionChart data={contextEmotionsSummary[0].summary} />
+            </InfoCard>
 
-            <InfoCard>{/* Stats */}</InfoCard>
+            <InfoCard>
+              <CardStats>
+                <StatsTitle order={4}>Emoción más frecuente</StatsTitle>
+                <StatsValue order={1}>
+                  {
+                    emotionTranslation[
+                      contextEmotionsSummary[0].mostFrequent.emotion
+                    ]
+                  }
+                </StatsValue>
+                <StatsText>
+                  <b>Intensidad promedio:</b>{" "}
+                  {contextEmotionsSummary[0].mostFrequent.averageIntensity}
+                </StatsText>
+                <StatsText>
+                  <b>Número de veces:</b>{" "}
+                  {contextEmotionsSummary[0].mostFrequent.count}
+                </StatsText>
+              </CardStats>
+            </InfoCard>
           </Grid>
         </CardContainer>
       </DashboardContainer>
