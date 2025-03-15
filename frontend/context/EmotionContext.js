@@ -14,8 +14,7 @@ export const EmotionProvider = ({ children }) => {
 
   const newEmotion = async (emotionData) => {
     setLoading(true);
-    const token = Cookie.get("token");
-    const emotion = await addEmotion(token, emotionData);
+    const emotion = await addEmotion(emotionData);
     setEmotions((prev) => [emotion, ...prev]);
     setLoading(false);
   };

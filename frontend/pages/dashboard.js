@@ -167,26 +167,31 @@ export default function Dashboard({ emotionsSummary }) {
           <Title order={2}>Estadísticas</Title>
           <Grid>
             <InfoCard>
-              <EmotionChart data={contextEmotionsSummary[0].summary} />
+              <EmotionChart
+                data={
+                  contextEmotionsSummary && contextEmotionsSummary[0]?.summary
+                }
+              />
             </InfoCard>
 
             <InfoCard>
               <CardStats>
                 <StatsTitle order={4}>Emoción más frecuente</StatsTitle>
                 <StatsValue order={1}>
-                  {
+                  {contextEmotionsSummary &&
                     emotionTranslation[
-                      contextEmotionsSummary[0].mostFrequent.emotion
-                    ]
-                  }
+                      contextEmotionsSummary[0]?.mostFrequent?.emotion
+                    ]}
                 </StatsValue>
                 <StatsText>
                   <b>Intensidad promedio:</b>{" "}
-                  {contextEmotionsSummary[0].mostFrequent.averageIntensity}
+                  {contextEmotionsSummary &&
+                    contextEmotionsSummary[0]?.mostFrequent?.averageIntensity}
                 </StatsText>
                 <StatsText>
                   <b>Número de veces:</b>{" "}
-                  {contextEmotionsSummary[0].mostFrequent.count}
+                  {contextEmotionsSummary &&
+                    contextEmotionsSummary[0]?.mostFrequent?.count}
                 </StatsText>
               </CardStats>
             </InfoCard>

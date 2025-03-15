@@ -1,24 +1,8 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import styled from "styled-components";
 import { EmotionContext } from "../context/EmotionContext";
-
-const HistoryContainer = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-`;
-
-const Title = styled.h2`
-  margin-top: 0;
-  color: #2c3e50;
-`;
-
-const EmptyState = styled.p`
-  color: #7f8c8d;
-  text-align: center;
-  font-style: italic;
-`;
+import { CardContainer, Card, Empty } from "./ui";
+import { useTheme } from "styled-components";
 
 const EmotionList = styled.div`
   display: flex;
@@ -26,111 +10,122 @@ const EmotionList = styled.div`
   gap: 1rem;
 `;
 
-const EmotionCard = styled.div`
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
 const EmotionHeader = styled.div`
   display: flex;
   justify-content: space-between;
 `;
 
-const EmotionName = styled.span`
-  font-weight: bold;
-  text-transform: capitalize;
+const EmotionCard = styled(Card)`
+  border-left: 4px solid ${({ theme, emotion }) => theme[emotion]};
+  background-color: ${({ theme, emotion }) => theme[emotion]}10;
+  padding: 1rem;
+`;
 
-  &.happy {
-    color: #27ae60;
-  }
-  &.sad {
-    color: #2980b9;
-  }
-  &.angry {
-    color: #c0392b;
-  }
-  &.anxious {
-    color: #f39c12;
-  }
-  &.neutral {
-    color: #7f8c8d;
-  }
+const EmotionName = styled.span`
+  font-weight: 600;
+  text-transform: capitalize;
+`;
+
+const EmotionInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 `;
 
 const EmotionDate = styled.span`
   color: #7f8c8d;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 `;
 
 const EmotionIntensity = styled.div`
-  margin: 0.5rem 0;
-
-  span {
-    font-size: 0.9rem;
-    color: #7f8c8d;
-  }
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #dbdbdb;
+  border-radius: 60px;
+  padding: 0.2rem 0.5rem;
 `;
 
 const EmotionNotes = styled.p`
   margin: 0;
   color: #34495e;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+
+  span {
+    font-weight: 600;
+  }
 `;
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return date.toLocaleString();
+  return date.toLocaleString("es-ES", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
 };
 
 const EmotionHistory = ({ emotions }) => {
   const { loading } = useContext(EmotionContext);
+  const theme = useTheme();
+
+  const emotionColors = {
+    happy: theme.colors.happy,
+    sad: theme.colors.sad,
+    angry: theme.colors.angry,
+    anxious: theme.colors.anxious,
+    neutral: theme.colors.neutral,
+  };
 
   const translateEmotion = (emotion) => {
     const translations = {
-      happy: "Feliz",
-      sad: "Triste",
-      angry: "Enojado",
-      anxious: "Ansioso",
-      neutral: "Neutral",
+      happy: "😊 Feliz",
+      sad: "😢 Triste",
+      angry: "😠 Enojado",
+      anxious: "😰 Ansioso",
+      neutral: "😐 Neutral",
     };
     return translations[emotion] || emotion;
   };
 
   return (
-    <HistoryContainer>
-      <Title>Historial de Emociones</Title>
-
+    <CardContainer title="Historial de Emociones">
       {loading ? (
         <p>Cargando...</p>
       ) : emotions.length === 0 ? (
-        <EmptyState>
-          No hay emociones registradas aún. ¡Comienza a hacer seguimiento de tus
-          emociones arriba!
-        </EmptyState>
+        <Empty title="No hay emociones registradas aún. ¡Comienza a hacer seguimiento de tus emociones arriba!" />
       ) : (
         <EmotionList>
           {emotions.map((emotion) => (
-            <EmotionCard key={emotion.id || emotion._id}>
+            <EmotionCard
+              key={emotion.id || emotion._id}
+              emotion={emotion.emotion}
+              theme={emotionColors}
+            >
               <EmotionHeader>
-                <EmotionName className={emotion.emotion}>
-                  {translateEmotion(emotion.emotion)}
-                </EmotionName>
+                <EmotionInfo>
+                  <EmotionName className={emotion.emotion}>
+                    {translateEmotion(emotion.emotion)}
+                  </EmotionName>
+                  <EmotionIntensity>{emotion.intensity}/10</EmotionIntensity>
+                </EmotionInfo>
                 <EmotionDate>{formatDate(emotion.date)}</EmotionDate>
               </EmotionHeader>
 
-              <EmotionIntensity>
-                Intensidad: <span>{emotion.intensity}/10</span>
-              </EmotionIntensity>
-
-              {emotion.notes && <EmotionNotes>{emotion.notes}</EmotionNotes>}
+              {emotion.notes && (
+                <EmotionNotes>
+                  <span>Nota:</span> {emotion.notes}
+                </EmotionNotes>
+              )}
             </EmotionCard>
           ))}
         </EmotionList>
       )}
-    </HistoryContainer>
+    </CardContainer>
   );
 };
 
