@@ -1,4 +1,5 @@
 const Emotion = require("../models/emotionModel");
+const mongoose = require("mongoose");
 
 // Get all emotions for a user
 const getEmotions = async (req, res) => {
@@ -51,35 +52,64 @@ const updateEmotion = async (req, res) => {
   res.json(updatedEmotion);
 };
 
-const getEmotionSummary = async (userId) => {
-  const aggregation = [
-    {
+const getEmotionSummary = async (req, res) => {
+  try {
+    const matchStage = {
       $match: {
-        user: userId,
+        user: mongoose.Types.ObjectId(req.user._id),
       },
-    },
-    {
-      $group: {
-        _id: null,
-        count: { $sum: 1 },
-        averageIntensity: { $avg: "$intensity" },
-        emotionCounts: {
-          $push: { $toInt: 1 },
+    };
+
+    const aggregation = [
+      matchStage,
+      {
+        $group: {
+          _id: "$emotion",
+          count: { $sum: 1 },
+          averageIntensity: { $avg: "$intensity" },
         },
       },
-    },
-    {
-      $project: {
-        _id: 0,
-        count: 1,
-        averageIntensity: 1,
-        emotionCounts: 1,
+      {
+        $project: {
+          emotion: "$_id",
+          _id: 0,
+          count: 1,
+          averageIntensity: { $round: ["$averageIntensity", 1] },
+        },
       },
-    },
-  ];
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $facet: {
+          allEmotions: [{ $match: {} }],
+          topEmotion: [{ $limit: 1 }],
+        },
+      },
+      {
+        $project: {
+          summary: "$allEmotions",
+          mostFrequent: { $arrayElemAt: ["$topEmotion", 0] },
+        },
+      },
+    ];
 
-  const summary = await Emotion.aggregate(aggregation);
-  return summary;
+    const summary = await Emotion.aggregate(aggregation);
+
+    if (!summary.length) {
+      return res.status(404).json({
+        message: "No se encontraron registros de emociones para este período",
+      });
+    }
+
+    res.json(summary);
+  } catch (error) {
+    console.error("Error en getEmotionSummary:", error);
+    res.status(500).json({
+      message: "Error al obtener el resumen de emociones",
+      error: error.message,
+    });
+  }
 };
 
 module.exports = {
