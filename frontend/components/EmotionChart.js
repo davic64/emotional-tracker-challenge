@@ -8,6 +8,7 @@ import {
 } from "recharts";
 import styled from "styled-components";
 import { Title } from "./ui";
+import { useTheme } from "styled-components";
 
 const TooltipContainer = styled.div`
   background-color: #fff;
@@ -77,19 +78,20 @@ const getEmotionLabel = (emotion) => {
   return labels[emotion] || emotion;
 };
 
-const getEmotionColor = (emotion) => {
-  const colors = {
-    happy: "#FFC107",
-    sad: "#2196F3",
-    angry: "#F44336",
-    anxious: "#8230c8",
-    neutral: "#9E9E9E",
-  };
-  return colors[emotion] || "#000000";
-};
-
 const EmotionChart = ({ data }) => {
+  const theme = useTheme();
   const chartKey = Date.now();
+
+  const getEmotionColor = (emotion) => {
+    const colors = {
+      happy: theme.colors.happy,
+      sad: theme.colors.sad,
+      angry: theme.colors.angry,
+      anxious: theme.colors.anxious,
+      neutral: theme.colors.neutral,
+    };
+    return colors[emotion] || "#000000";
+  };
 
   return (
     <ResponsiveContainer width="100%" height={300}>

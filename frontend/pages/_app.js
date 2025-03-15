@@ -1,6 +1,6 @@
-import { createGlobalStyle, ThemeProvider } from 'styled-components';
-import { AuthProvider } from '../context/AuthContext';
-import { EmotionProvider } from '../context/EmotionContext';
+import { createGlobalStyle, ThemeProvider } from "styled-components";
+import { AuthProvider } from "../context/AuthContext";
+import { EmotionProvider } from "../context/EmotionContext";
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
@@ -26,13 +26,20 @@ const GlobalStyle = createGlobalStyle`
 
 const theme = {
   colors: {
-    primary: '#3CABDB',
-    secondary: '#2ecc71',
-    danger: '#e74c3c',
-    warning: '#f39c12',
-    dark: '#2c3e50',
-    light: '#ecf0f1'
-  }
+    primary: "#3CABDB",
+    secondary: "#2ecc71",
+    danger: "#e74c3c",
+    warning: "#f39c12",
+    dark: "#2c3e50",
+    light: "#ecf0f1",
+
+    // Emotion Colors
+    happy: "#FFC107",
+    sad: "#2196F3",
+    angry: "#F44336",
+    anxious: "#8230c8",
+    neutral: "#9E9E9E",
+  },
 };
 
 function MyApp({ Component, pageProps }) {

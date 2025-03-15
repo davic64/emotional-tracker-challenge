@@ -45,9 +45,8 @@ export const addEmotion = async (emotionData) => {
 };
 
 // Summarize emotions
-export const summarizeEmotions = async () => {
+export const summarizeEmotions = async (token) => {
   try {
-    const token = Cookie.get("token");
     if (!token) {
       throw new Error("No token found");
     }
