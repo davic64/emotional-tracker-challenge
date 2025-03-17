@@ -51,6 +51,7 @@ const loginUser = async (req, res) => {
       name: user.name,
       email: user.email,
       token: generateToken(user._id),
+      ...(user.therapistId && { therapist: user.therapistId }),
     });
   } else {
     throw new Error("Invalid email or password", { statusCode: 401 });
@@ -65,6 +66,7 @@ const getUserProfile = async (req, res) => {
     _id: user._id,
     name: user.name,
     email: user.email,
+    ...(user.therapistId && { therapist: user.therapistId }),
   });
 };
 
@@ -82,6 +84,7 @@ const updateUserProfile = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      ...(user.therapistId && { therapist: user.therapistId }),
     });
   } else {
     throw new Error("User not found", { statusCode: 404 });

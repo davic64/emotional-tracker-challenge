@@ -7,9 +7,6 @@ import {
   checkUserLoggedIn,
   updateProfile as updateProfileAPI,
 } from "../lib/auth.api";
-import Cookie from "js-cookie";
-// API URL
-const API_URL = "http://localhost:5050/api";
 
 export const AuthContext = createContext();
 

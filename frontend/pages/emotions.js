@@ -7,6 +7,8 @@ import EmotionHistory from "../components/EmotionHistory";
 import { AuthContext } from "../context/AuthContext";
 import { EmotionContext } from "../context/EmotionContext";
 import { getEmotions } from "../lib/emotions.api";
+import { getTherapist } from "../lib/therapists.api";
+import { TherapistContext } from "../context/TherapistContext";
 
 const EmotionsContainer = styled.div`
   display: flex;
@@ -20,7 +22,6 @@ const Title = styled.h1`
 
 export async function getServerSideProps(context) {
   const { token } = context.req.cookies;
-
   try {
     const data = await getEmotions(token);
     return { props: { emotions: data } };
@@ -35,6 +36,7 @@ export default function Emotions({ emotions }) {
   const router = useRouter();
   const { setInitialEmotions, emotions: contextEmotions } =
     useContext(EmotionContext);
+  const { setInitialTherapist, therapist } = useContext(TherapistContext);
 
   // Basic auth protection
   useEffect(() => {
@@ -42,6 +44,14 @@ export default function Emotions({ emotions }) {
       router.push("/login");
     }
   }, [loading, user, router]);
+
+  useEffect(() => {
+    if (user) {
+      getTherapist(user.therapist).then((therapist) => {
+        setInitialTherapist(therapist);
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     setInitialEmotions(emotions);
@@ -61,9 +71,7 @@ export default function Emotions({ emotions }) {
         <Title>Seguimiento Emocional</Title>
 
         <EmotionTracker />
-        <EmotionHistory emotions={contextEmotions} />
-
-        {/* TODO: Add functionality to share emotions with therapist */}
+        <EmotionHistory emotions={contextEmotions} therapist={therapist} />
       </EmotionsContainer>
     </Layout>
   );

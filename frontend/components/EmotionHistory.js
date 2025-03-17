@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { EmotionContext } from "../context/EmotionContext";
 import { CardContainer, Card, Empty } from "./ui";
 import { useTheme } from "styled-components";
+import ShareForm from "./ShareForm";
 
 const EmotionList = styled.div`
   display: flex;
@@ -56,6 +57,36 @@ const EmotionNotes = styled.p`
   }
 `;
 
+const HistoryContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  flex-direction: column;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+`;
+
+const ListContainer = styled(CardContainer)`
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: 65%;
+  }
+`;
+
+const ShareContainer = styled(CardContainer)`
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: 35%;
+    height: fit-content;
+    position: sticky;
+    top: 1rem;
+  }
+`;
+
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleString("es-ES", {
@@ -69,7 +100,7 @@ const formatDate = (dateString) => {
   });
 };
 
-const EmotionHistory = ({ emotions }) => {
+const EmotionHistory = ({ emotions, therapist }) => {
   const { loading } = useContext(EmotionContext);
   const theme = useTheme();
 
@@ -93,39 +124,44 @@ const EmotionHistory = ({ emotions }) => {
   };
 
   return (
-    <CardContainer title="Historial de Emociones">
-      {loading ? (
-        <p>Cargando...</p>
-      ) : emotions.length === 0 ? (
-        <Empty title="No hay emociones registradas aún. ¡Comienza a hacer seguimiento de tus emociones arriba!" />
-      ) : (
-        <EmotionList>
-          {emotions.map((emotion) => (
-            <EmotionCard
-              key={emotion.id || emotion._id}
-              emotion={emotion.emotion}
-              theme={emotionColors}
-            >
-              <EmotionHeader>
-                <EmotionInfo>
-                  <EmotionName className={emotion.emotion}>
-                    {translateEmotion(emotion.emotion)}
-                  </EmotionName>
-                  <EmotionIntensity>{emotion.intensity}/10</EmotionIntensity>
-                </EmotionInfo>
-                <EmotionDate>{formatDate(emotion.date)}</EmotionDate>
-              </EmotionHeader>
+    <HistoryContainer>
+      <ListContainer title="Historial de Emociones">
+        {loading ? (
+          <p>Cargando...</p>
+        ) : emotions.length === 0 ? (
+          <Empty title="No hay emociones registradas aún. ¡Comienza a hacer seguimiento de tus emociones arriba!" />
+        ) : (
+          <EmotionList>
+            {emotions.map((emotion) => (
+              <EmotionCard
+                key={emotion.id || emotion._id}
+                emotion={emotion.emotion}
+                theme={emotionColors}
+              >
+                <EmotionHeader>
+                  <EmotionInfo>
+                    <EmotionName className={emotion.emotion}>
+                      {translateEmotion(emotion.emotion)}
+                    </EmotionName>
+                    <EmotionIntensity>{emotion.intensity}/10</EmotionIntensity>
+                  </EmotionInfo>
+                  <EmotionDate>{formatDate(emotion.date)}</EmotionDate>
+                </EmotionHeader>
 
-              {emotion.notes && (
-                <EmotionNotes>
-                  <span>Nota:</span> {emotion.notes}
-                </EmotionNotes>
-              )}
-            </EmotionCard>
-          ))}
-        </EmotionList>
-      )}
-    </CardContainer>
+                {emotion.notes && (
+                  <EmotionNotes>
+                    <span>Nota:</span> {emotion.notes}
+                  </EmotionNotes>
+                )}
+              </EmotionCard>
+            ))}
+          </EmotionList>
+        )}
+      </ListContainer>
+      <ShareContainer title="Compartir Emociones">
+        <ShareForm therapist={therapist} />
+      </ShareContainer>
+    </HistoryContainer>
   );
 };
 
