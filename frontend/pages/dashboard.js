@@ -148,7 +148,9 @@ export default function Dashboard({ emotionsSummary }) {
                 Configura recordatorios para actividades que mejoran tu salud
                 mental.
               </Text>
-              <CardLink>Próximamente</CardLink>
+              <CardLink onClick={() => router.push("/reminders")}>
+                Sistemas de Recordatorios
+              </CardLink>
             </InfoCard>
           </CardContainer>
 

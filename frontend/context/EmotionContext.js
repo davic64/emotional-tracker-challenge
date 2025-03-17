@@ -1,5 +1,4 @@
 import { createContext, useState } from "react";
-import Cookie from "js-cookie";
 import { addEmotion } from "../lib/emotions.api";
 
 export const EmotionContext = createContext();

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
 const emotionRoutes = require("./routes/emotionRoutes");
+const reminderRoutes = require("./routes/ReminderRoutes");
 const configDB = require("./config/db");
 const errorHandler = require("./middlewares/errorHandler");
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/emotions", emotionRoutes);
+app.use("/api/reminders", reminderRoutes);
 
 // Unprotected test route
 app.get("/api/status", (req, res) => {

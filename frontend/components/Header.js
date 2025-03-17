@@ -1,7 +1,7 @@
-import { useContext } from 'react';
-import Link from 'next/link';
-import styled from 'styled-components';
-import { AuthContext } from '../context/AuthContext';
+import { useContext } from "react";
+import Link from "next/link";
+import styled from "styled-components";
+import { AuthContext } from "../context/AuthContext";
 
 const HeaderContainer = styled.header`
   background-color: #2c3e50;
@@ -31,7 +31,7 @@ const NavLink = styled.a`
   color: white;
   text-decoration: none;
   cursor: pointer;
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -48,7 +48,7 @@ const Header = () => {
             <a>TerapiaEmocional</a>
           </Link>
         </Logo>
-        
+
         <NavLinks>
           {user ? (
             <>
@@ -57,6 +57,9 @@ const Header = () => {
               </Link>
               <Link href="/emotions">
                 <NavLink>Emociones</NavLink>
+              </Link>
+              <Link href="/reminders">
+                <NavLink>Recordatorios</NavLink>
               </Link>
               <NavLink onClick={logout}>Cerrar Sesión</NavLink>
             </>
