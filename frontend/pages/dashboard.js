@@ -160,7 +160,9 @@ export default function Dashboard({ emotionsSummary }) {
               <Text>
                 Comparte tus datos de seguimiento emocional con tu terapeuta.
               </Text>
-              <CardLink>Próximamente</CardLink>
+              <CardLink onClick={() => router.push("/emotions")}>
+                Compartir Emociones
+              </CardLink>
             </InfoCard>
           </CardContainer>
         </Grid>

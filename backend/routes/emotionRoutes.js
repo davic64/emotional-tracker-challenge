@@ -17,7 +17,4 @@ router.get("/summary", protect, getEmotionSummary);
 router.get("/:id", getEmotionById);
 
 router.put("/:id", protect, updateEmotion);
-
-// TODO: Add route for sharing data with therapists
-
 module.exports = router;

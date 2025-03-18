@@ -18,8 +18,21 @@ const EmotionHeader = styled.div`
 
 const EmotionCard = styled(Card)`
   border-left: 4px solid ${({ theme, emotion }) => theme[emotion]};
+  border-top: ${({ isSelected }) =>
+    isSelected ? "1px solid #3498db" : "none"};
+  border-right: ${({ isSelected }) =>
+    isSelected ? "1px solid #3498db" : "none"};
+  border-bottom: ${({ isSelected }) =>
+    isSelected ? "1px solid #3498db" : "none"};
   background-color: ${({ theme, emotion }) => theme[emotion]}10;
   padding: 1rem;
+  cursor: ${({ isShared }) => (isShared ? "not-allowed" : "pointer")};
+  transition: all 0.2s ease;
+  opacity: ${({ isShared }) => (isShared ? 0.7 : 1)};
+
+  &:hover {
+    transform: ${({ isShared }) => (isShared ? "none" : "translateX(4px)")};
+  }
 `;
 
 const EmotionName = styled.span`
@@ -44,6 +57,11 @@ const EmotionIntensity = styled.div`
   border: 1px solid #dbdbdb;
   border-radius: 60px;
   padding: 0.2rem 0.5rem;
+`;
+
+const SharedBadge = styled(EmotionIntensity)`
+  background-color: #34db5b;
+  color: white;
 `;
 
 const EmotionNotes = styled.p`
@@ -101,7 +119,8 @@ const formatDate = (dateString) => {
 };
 
 const EmotionHistory = ({ emotions, therapist }) => {
-  const { loading } = useContext(EmotionContext);
+  const { loading, sharedEmotion, setSharedEmotion } =
+    useContext(EmotionContext);
   const theme = useTheme();
 
   const emotionColors = {
@@ -137,6 +156,11 @@ const EmotionHistory = ({ emotions, therapist }) => {
                 key={emotion.id || emotion._id}
                 emotion={emotion.emotion}
                 theme={emotionColors}
+                isSelected={sharedEmotion === (emotion.id || emotion._id)}
+                isShared={emotion.shared}
+                onClick={() =>
+                  !emotion.shared && setSharedEmotion(emotion.id || emotion._id)
+                }
               >
                 <EmotionHeader>
                   <EmotionInfo>
@@ -144,6 +168,7 @@ const EmotionHistory = ({ emotions, therapist }) => {
                       {translateEmotion(emotion.emotion)}
                     </EmotionName>
                     <EmotionIntensity>{emotion.intensity}/10</EmotionIntensity>
+                    {emotion.shared && <SharedBadge>Compartido</SharedBadge>}
                   </EmotionInfo>
                   <EmotionDate>{formatDate(emotion.date)}</EmotionDate>
                 </EmotionHeader>
@@ -159,7 +184,7 @@ const EmotionHistory = ({ emotions, therapist }) => {
         )}
       </ListContainer>
       <ShareContainer title="Compartir Emociones">
-        <ShareForm therapist={therapist} />
+        <ShareForm therapist={therapist} emotionIds={sharedEmotion} />
       </ShareContainer>
     </HistoryContainer>
   );

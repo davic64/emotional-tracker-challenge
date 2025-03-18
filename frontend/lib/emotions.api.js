@@ -66,3 +66,26 @@ export const summarizeEmotions = async (token) => {
     throw error;
   }
 };
+
+// Share emotions
+export const shareEmotions = async (emotionId) => {
+  try {
+    const token = Cookie.get("token");
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await api.put(
+      `/emotions/${emotionId}`,
+      { shared: true },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error sharing emotions:", error);
+    throw error;
+  }
+};

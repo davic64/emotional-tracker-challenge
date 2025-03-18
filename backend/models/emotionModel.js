@@ -21,6 +21,11 @@ const emotionSchema = new mongoose.Schema({
     min: 1,
     max: 10,
   },
+  shared: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
   notes: String,
   triggers: [String],
   activities: [String],

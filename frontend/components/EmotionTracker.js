@@ -104,7 +104,7 @@ const EmotionTracker = () => {
           />
         </InputGroup>
 
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading || !form.notes}>
           {loading ? "Registrando..." : "Registrar Emoción"}
         </Button>
       </Form>

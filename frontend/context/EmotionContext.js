@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { addEmotion } from "../lib/emotions.api";
+import { addEmotion, shareEmotions } from "../lib/emotions.api";
 
 export const EmotionContext = createContext();
 
@@ -7,6 +7,7 @@ export const EmotionProvider = ({ children }) => {
   const [emotions, setEmotions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [emotionsSummary, setEmotionsSummary] = useState(null);
+  const [sharedEmotion, setSharedEmotion] = useState(null);
 
   const setInitialEmotions = (data) => setEmotions(data);
   const setInitialEmotionsSummary = (data) => setEmotionsSummary(data);
@@ -19,8 +20,16 @@ export const EmotionProvider = ({ children }) => {
   };
 
   const shareWithTherapist = async (emotionIds) => {
-    // TODO: Implement sharing with therapist
-    console.log("Sharing emotions with therapist:", emotionIds);
+    setLoading(true);
+    await shareEmotions(emotionIds);
+    setEmotions((prevEmotions) =>
+      prevEmotions.map((emotion) =>
+        emotionIds.includes(emotion._id)
+          ? { ...emotion, shared: true }
+          : emotion
+      )
+    );
+    setLoading(false);
   };
 
   return (
@@ -33,6 +42,8 @@ export const EmotionProvider = ({ children }) => {
         shareWithTherapist,
         emotionsSummary,
         setInitialEmotionsSummary,
+        sharedEmotion,
+        setSharedEmotion,
       }}
     >
       {children}

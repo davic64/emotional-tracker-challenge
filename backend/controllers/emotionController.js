@@ -35,7 +35,7 @@ const createEmotion = async (req, res) => {
 
 // Update an emotion
 const updateEmotion = async (req, res) => {
-  const { emotion, intensity, notes } = req.body;
+  const { emotion, intensity, notes, shared } = req.body;
 
   const emotionRecord = await Emotion.findById(req.params.id);
 
@@ -47,6 +47,9 @@ const updateEmotion = async (req, res) => {
   emotionRecord.emotion = emotion || emotionRecord.emotion;
   emotionRecord.intensity = intensity || emotionRecord.intensity;
   emotionRecord.notes = notes || emotionRecord.notes;
+  if (shared !== undefined) {
+    emotionRecord.shared = shared;
+  }
 
   const updatedEmotion = await emotionRecord.save();
   res.json(updatedEmotion);
